@@ -974,6 +974,12 @@ class Container implements ArrayAccess, ContainerContract
                 continue;
             }
 
+            if (! is_null($concrete = $this->getContextualConcrete('$'.$dependency->getName()))) {
+                $results[] = Util::unwrapIfClosure($concrete, $this);
+
+                continue;
+            }
+
             // If the class is null, it means the dependency is a string or some other
             // primitive type which we can not resolve since it is not a class and
             // we will just bomb out with an error since we have no-where to go.
@@ -1035,10 +1041,6 @@ class Container implements ArrayAccess, ContainerContract
      */
     protected function resolvePrimitive(ReflectionParameter $parameter)
     {
-        if (! is_null($concrete = $this->getContextualConcrete('$'.$parameter->getName()))) {
-            return Util::unwrapIfClosure($concrete, $this);
-        }
-
         if ($parameter->isDefaultValueAvailable()) {
             return $parameter->getDefaultValue();
         }
